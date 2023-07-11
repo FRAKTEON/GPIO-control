@@ -1,21 +1,42 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#ifndef GPIO_CONTROL_GPIO_H
+#define GPIO_CONTROL_GPIO_H
+#endif
+#include "termios.h"
+#define MAX_PINS 28
 
-typedef struct gpio {
-    char *pin;
-    int fd;
-}GPIO;
+struct gpio {
+    char name[8];
+    int direction,
+    value;
+};
 
-int input(int argc, char **argv);
-int help();
-int status();
-int config();
-int export_pin(GPIO *p_io);
-int direction(GPIO *p_io);
-int toggle(GPIO *p_io);
-int unexport(GPIO *p_io);
+enum keys {
+    ENTER = 10,
+    DIRECTION = 'd',
+    QUIT = 'q',
+    CANCEL = 'c',
+    UP_ARROW = 65,
+    DOWN_ARROW = 66
+};
+
+/*Main program functions*/
+int init_struct(struct gpio gpio[]);
+int interface(struct gpio *gpio);
+int cfg_save(struct gpio *gpio);
+int cfg_cancel(struct gpio *gpio);
+int cfg_restore(struct gpio *gpio);
+
+/*System gpio functions*/
+int gpio_export(struct gpio *gpio);
+int gpio_direction(struct gpio *gpio);
+int gpio_toggle(struct gpio *gpio);
+int gpio_unexport(struct gpio *gpio);
+
+/*Utility functions*/
+int set_terminal(struct termios new);
+int reset_terminal(struct termios def);
+int display_menu(struct gpio *gpio, int index);
+int create_save_file(void);
+int help(void);
+int status(void);
+int unknown(char *str);
